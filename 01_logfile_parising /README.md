@@ -1,96 +1,52 @@
-# Log Parser CLI Tool
+# Log Parser
 
-This script parses a log file and counts log levels (`INFO`, `WARNING`, `ALERT`).
-Optionally, it can also print the line numbers where each log level appears.
+Simple Python CLI script to scan a log file and count keyword matches.
 
-It is designed as a simple command-line tool and works well with large log files.
+## What It Does
 
----
+- Reads a log file line by line (memory-friendly).
+- Searches for one or more keywords (case-insensitive).
+- Writes matched lines to `report.txt`.
+- Appends a final summary dictionary with total counts per keyword.
 
 ## Requirements
 
-* Python 3.8 or newer
-* No external dependencies (uses only standard library)
-
----
+- Python 3.x
 
 ## Usage
 
-Basic usage:
+Run from this folder:
 
-```bash
-python log_parser.py --file LOG_FILE
+```powershell
+py logParser.py <logfile> <keyword1> <keyword2> ...
 ```
 
 Example:
 
-```bash
-python log_parser.py --file app.log
+```powershell
+py logParser.py app.log ERROR Failed
 ```
 
-This will print how many times each log level appears.
+## Arguments
 
----
+- `logfile`: path to input log file (required)
+- `keywords`: one or more search terms (required)
 
-## Show Line Numbers (Optional)
+## Output
 
-To also print the line numbers where each log level occurs, use:
+The script creates/overwrites:
 
-```bash
-python log_parser.py --file app.log --show-lines
-```
+- `report.txt`
 
----
+`report.txt` contains:
 
-## Example Output
-
-Without `--show-lines`:
-
-```
-INFO: 12
-WARNING: 3
-ALERT: 1
-```
-
-With `--show-lines`:
-
-```
-INFO: 12
-WARNING: 3
-ALERT: 1
-############ LINES ############
-INFO lines: [1, 4, 7, 10, ...]
-WARNING lines: [15, 42, 88]
-ALERT lines: [101]
-```
-
----
-
-## Log Level Detection
-
-The script uses regular expressions to detect log levels accurately.
-It matches only full words, so it will **not** count misleading cases such as:
-
-* `INFORMATION`
-* `USER_INFO`
-
-Only exact log levels are counted.
-
----
-
-## Exit Codes
-
-* `0` → Successful execution
-* `1` → Error (file not found, permission issue, etc.)
-
-This makes the script suitable for use in shell scripts, cron jobs, or CI/CD pipelines.
-
----
+1. One line per match in this format:
+   `line # <n> <date> -- <time> match: <keyword>`
+2. Final summary line, for example:
+   `{'error': 6, 'failed': 2}`
 
 ## Notes
 
-* The file is read line by line (memory-efficient).
-* Line number tracking is optional to avoid unnecessary memory usage.
-* Designed as a small, clear CLI utility.
-
----
+- Matching is case-insensitive.
+- Punctuation around tokens is stripped before matching.
+- If the input file is missing or invalid, the script prints an error and exits.
